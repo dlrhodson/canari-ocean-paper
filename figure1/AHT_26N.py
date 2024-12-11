@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import plot_styles as ps
 from scipy.stats import linregress
 import json
+from matplotlib.ticker import MultipleLocator, FixedLocator
 
 
 def plot_atlantic_ht_26n(ax):
@@ -94,6 +95,15 @@ def plot_atlantic_ht_26n(ax):
     
     #ax.title("Atlantic Heat Transport 26N PW 1σ Spread")
     ax.set_ylim(0.7, 1.4)
+    #import pdb; pdb.set_trace()
+
+    ax.set_xlim([ps.start_date.year, ps.end_date.year])
+    # Set ticks every 10 years
+    ax.xaxis.set_major_locator(MultipleLocator(20))
+    ax.xaxis.set_minor_locator(MultipleLocator(10))
+    # Set labels every 20 years
+    #major_ticks = list(range(ps.start_date.year, ps.end_date.year, 20))
+    #ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f"{int(x)}" if x in major_ticks else ""))
 
     ax.plot(time,max_slope_member.array, label="max", color=ps.max_colour)
     ax.plot(time,min_slope_member.array, label="min", color=ps.min_colour)

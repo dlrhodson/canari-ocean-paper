@@ -25,11 +25,14 @@ axes = axes.flatten()
 # Define the function calls for each panel
 plot_functions = [plot_amoc_timeseries, plot_amoc_2d, plot_atlantic_ht_26n ,  plot_atlantic_st_26n]
 
+titles=['AMOC 26N','Stream Function on $\sigma_2$','Heat transport 26N', 'Salt transport 26N']
 # Loop through each panel, plot the data, and add labels
 for i, (ax, plot_func) in enumerate(zip(axes, plot_functions)):
     print(plot_func.__name__)
     plot_func(ax)  # Call the plotting function for each panel, passing the axis to plot on
      # Add the label in the top left corner, bold and 50% larger
+
+    
     ax.text(
         0.025, 0.975, f"{chr(97 + i)})", 
         transform=ax.transAxes, 
@@ -37,6 +40,14 @@ for i, (ax, plot_func) in enumerate(zip(axes, plot_functions)):
         fontweight='bold', 
         va='top', ha='left'
     )
+    ax.text(
+        0.025, 1.05, f"{titles[i]}", 
+        transform=ax.transAxes, 
+        fontsize='large',  # This makes it 50% larger than the default size
+        fontweight='bold', 
+        va='top', ha='left'
+    )
+
     #ax.set_title(f"{chr(97 + i)})")  # Adds labels 'a)' to 'd)' to each panel in the corner
 
 # Adjust layout to avoid overlap
@@ -44,6 +55,6 @@ plt.tight_layout()
 
 # Add script path as text below x-axis
 script_path = os.path.abspath(__file__)
-plt.figtext(0.5, 0.985, f"{script_path}", ha='center', fontsize=8)
+plt.figtext(0.5, 0.990, f"{script_path}", ha='center', fontsize=8)
 
 plt.show()

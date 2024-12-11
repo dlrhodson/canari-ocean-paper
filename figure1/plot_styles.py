@@ -1,4 +1,5 @@
 # plot_styles.py
+import cftime
 
 # Define colors for each line or plot element
 spread_colour='lightgray'
@@ -32,3 +33,7 @@ legend_labels = {
     "spread": "1σ Spread",
     "rapid": "RAPID"
 }
+
+start_date=cftime.DatetimeNoLeap(1950,1,1)
+end_date=cftime.DatetimeNoLeap(2024,12,30)
+    

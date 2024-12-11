@@ -13,13 +13,23 @@ import glob
 import pandas as pd
 import plot_styles as ps
 import json
-
-
+from datetime import datetime
+from matplotlib.ticker import MultipleLocator, FixedLocator
+import matplotlib.dates as mdates
 
 def plot_amoc_timeseries(ax):
 
     fp = "/home/users/atb299/CANARI/Figures/"
 
+
+    def my_func(x,pos):
+        print(type(x))
+        if pos is not None:
+            if pos%2==1:
+                return(x)
+        return("")
+
+    
 
     def find_nearest(array,value):
         idx,val = min(enumerate(array), key=lambda x: abs(x[1]-value))
@@ -84,10 +94,13 @@ def plot_amoc_timeseries(ax):
     # Convert to datetime64 format        
     Ramoc_M360 = Ramoc_M.convert_calendar(calendar = '360_day', align_on = 'date')
     Ramoc_Y360 = Ramoc_Y.convert_calendar(calendar = '360_day', align_on = 'date')
-
+    
+    Ramoc_Y360_time=[x.year for x in Ramoc_Y360.coords['time'].values]
+    
     # Bryden 2005 dots
     import cftime
-    brydent = [cftime.Datetime360Day(1957,1,1), cftime.Datetime360Day(1981,1,1), cftime.Datetime360Day(1992,1,1), cftime.Datetime360Day(1998,1,1), cftime.Datetime360Day(2004,1,1)]
+    brydent0 = [cftime.Datetime360Day(1957,1,1), cftime.Datetime360Day(1981,1,1), cftime.Datetime360Day(1992,1,1), cftime.Datetime360Day(1998,1,1), cftime.Datetime360Day(2004,1,1)]
+    brydent=[x.year for x in brydent0]
     brydena = [22.9, 18.7, 19.4, 16.1, 14.8]
 
     #Plot AMOC time series
@@ -127,16 +140,41 @@ def plot_amoc_timeseries(ax):
     #Strongest AMOC trend: -1.64 Sv/decadea
     #Weakest AMOC trend:   -0.52 Sv/decade
 
+    times=[x.year for x in EM_amoc_26N_annual['time_counter'].values]
     #fig,axs = plt.subplots(1, 1, figsize=(9,5))
-    EM_amoc_26N_annual['zomsfatl_1k_mean'].plot(lw=3,color="white",ax=ax);
-    ax.fill_between(EM_amoc_26N_annual['time_counter'].values, EM_amoc_26N_annual['zomsfatl_1k_min'].values,EM_amoc_26N_annual['zomsfatl_1k_max'].values,color=ps.spread_colour,label="C_LE range")
-    ax.plot(EM_amoc_26N_annual['time_counter'],EM_amoc_26N_annual['zomsfatl_1k'][:,smax],color=ps.max_colour,label="C_LE min_trend");
-    ax.plot(EM_amoc_26N_annual['time_counter'],EM_amoc_26N_annual['zomsfatl_1k'][:,smin],color=ps.min_colour,label="C_LE max_trend");
-    ax.plot(EM_amoc_26N_annual['time_counter'],EM_amoc_26N_annual['zomsfatl_1k_mean'],color=ps.mean_colour,lw=3,label="C_LE mean");
-    Ramoc_Y360['moc_mar_hc10'].plot.line(label="RAPID",color=ps.obs_colour,lw=3,ax=ax);
+    ax.plot(times, EM_amoc_26N_annual['zomsfatl_1k_mean'].values,lw=3,color="white")
+    #EM_amoc_26N_annual['zomsfatl_1k_mean'].plot(lw=3,color="white",ax=ax);
+    
+    ax.fill_between(times, EM_amoc_26N_annual['zomsfatl_1k_min'].values,EM_amoc_26N_annual['zomsfatl_1k_max'].values,color=ps.spread_colour,label="C_LE range")
+    ax.plot(times,EM_amoc_26N_annual['zomsfatl_1k'][:,smax],color=ps.max_colour,label="C_LE min_trend");
+    ax.plot(times,EM_amoc_26N_annual['zomsfatl_1k'][:,smin],color=ps.min_colour,label="C_LE max_trend");
+    ax.plot(times,EM_amoc_26N_annual['zomsfatl_1k_mean'],color=ps.mean_colour,lw=3,label="C_LE mean");
+    #Ramoc_Y360['moc_mar_hc10'].plot.line(label="RAPID",color=ps.obs_colour,lw=3,ax=ax);
+    ax.plot(Ramoc_Y360_time, Ramoc_Y360['moc_mar_hc10'],label="RAPID",color=ps.obs_colour,lw=3)
+    
     ax.plot(brydent, brydena, 'ko',label="Bryden05")
 
-    ax.set_xlabel("Year"); ax.set_ylabel("MOC (Sv)")
+    ax.set_xlabel("Year"); ax.set_ylabel("AMOC (Sv)")
+    ax.set_xlim([ps.start_date.year, ps.end_date.year])
+    # Set ticks every 10 years
+    ax.xaxis.set_major_locator(MultipleLocator(20))
+    ax.xaxis.set_minor_locator(MultipleLocator(10))
+
+    #ax.xaxis.set_major_locator(mdates.YearLocator(20))
+    #ax.xaxis.set_minor_locator(mdates.YearLocator(10))
+    #MultipleLocator(10))
+    # Set labels every 20 years
+    #ax.setp(ax.axes.get_xticklabels(), visible=False)
+    #ax.setp(ax.axes.get_xticklabels()[::2], visible=True)
+    #major_ticks = list(range(ps.start_date.year, ps.end_date.year, 20))
+    #ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f"{int(x)}" if pos.year in major_ticks else ""))
+    #ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f"{int(x)}" if  in major_ticks else ""))
+    #import pdb; pdb.set_trace()
+
+    #  ax.xaxis.set_major_formatter(plt.FuncFormatter(my_func))
+    
+    #ax.set_xticklabels(ax.get_xticklabels()[::2])
+    
     #ax.legend();
     #plt.savefig(fp+'AMOC26N_1k_annual_ts_C_LE_paper.png', dpi=300, transparent=False, bbox_inches='tight', pad_inches=0.1)
 
